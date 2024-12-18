@@ -1,0 +1,97 @@
+### **4.5.3 Testing for Privilege Escalation
+
+---
+
+### **Descrição**
+Para a fase "Testing for Privilege Escalation" no **OWASP Testing Guide**, o objetivo é identificar falhas que permitam a elevação de privilégios, onde um usuário consegue acessar funcionalidades ou dados que deveriam ser restritos a outros papéis. Aqui está um guia sobre como realizar esses testes e as ferramentas recomendadas:  
+
+---
+
+### **Estratégias de Teste**
+1. **Mapear os papéis e permissões existentes**:
+   - Identifique os níveis de acesso que a aplicação suporta (e.g., usuário comum, administrador, moderador).
+   - Liste as ações que cada nível de permissão pode executar.
+
+2. **Testar endpoints e parâmetros sensíveis**:
+   - Valide se endpoints restritos podem ser acessados por usuários com permissões mais baixas.
+   - Teste parâmetros que controlam permissões (e.g., IDs de usuário, `role_id`, `isAdmin`).
+
+3. **Inspecionar o controle de sessão**:
+   - Verifique se cookies ou tokens JWT podem ser manipulados para obter mais privilégios.
+
+4. **Simular ações proibidas**:
+   - Tente executar ações de administradores ou visualizar dados sensíveis usando contas de usuários comuns.
+
+---
+
+### **Ferramentas e Como Usá-las**
+1. **Burp Suite (Community ou Professional)**
+   - **Uso**:
+     - Interceptar e modificar solicitações HTTP para testar permissões.
+     - Automatizar o envio de solicitações com o módulo *Intruder*.
+   - **Exemplo**:
+     - Intercepte uma solicitação que altera um perfil. Mude o `user_id` para outro e veja se a alteração é permitida.
+     - Teste headers como `X-User-Role` ou `X-Admin`.
+
+2. **Postman**
+   - **Uso**:
+     - Testar manualmente APIs com diferentes níveis de acesso.
+     - Modificar tokens de acesso ou parâmetros para simular diferentes contextos de usuário.
+   - **Exemplo**:
+     - Use um token JWT de um usuário comum e envie solicitações para endpoints de administrador.
+
+3. **JWT.io**
+   - **Uso**:
+     - Inspecionar e editar tokens JWT para verificar se permissões dependem apenas de valores no token.
+   - **Exemplo**:
+     - Altere o valor de `role: "user"` para `role: "admin"` e teste o acesso.
+
+4. **OWASP ZAP (Zed Attack Proxy)**
+   - **Uso**:
+     - Fazer interceptação e fuzzing em endpoints.
+     - Detectar falhas de autenticação e autorização com varreduras automatizadas.
+   - **Exemplo**:
+     - Configure um usuário com privilégios limitados e use o scanner de autorização para testar endpoints restritos.
+
+5. **Fiddler**
+   - **Uso**:
+     - Manipular e monitorar requisições HTTP/HTTPS.
+     - Testar alterações em cookies e cabeçalhos HTTP.
+   - **Exemplo**:
+     - Veja se cookies de sessão podem ser reutilizados para acessar outras contas.
+
+6. **SQLMap** (se a aplicação utiliza um banco de dados vulnerável)
+   - **Uso**:
+     - Explorar vulnerabilidades de injeção de SQL para elevar privilégios.
+   - **Exemplo**:
+     - Use payloads para alterar permissões diretamente no banco.
+
+7. **Nmap + NSE (Nmap Scripting Engine)**
+   - **Uso**:
+     - Identificar serviços expostos que possam ser usados para comprometer credenciais ou privilégios.
+   - **Exemplo**:
+     - Execute scripts de autenticação para validar configurações de acesso em portas abertas.
+
+---
+
+### **Dicas Práticas**
+1. **Automatize e teste iterativamente**:
+   - Use scripts para simular vários papéis e variações de parâmetros.
+   
+2. **Documente cada passo**:
+   - Registre os cenários explorados, as permissões testadas e os resultados obtidos.
+
+3. **Combine ferramentas manuais e automáticas**:
+   - Ferramentas automáticas ajudam na identificação inicial de vulnerabilidades, mas testes manuais são indispensáveis para validar problemas complexos.
+
+4. **Use contas distintas**:
+   - Prepare contas com diferentes níveis de acesso (usuário, moderador, administrador) para comparar comportamentos.
+
+---
+
+### **Entrega de Resultados**
+Após a execução, documente:
+- **Os endpoints vulneráveis**.
+- **As ações realizadas para escalar privilégios**.
+- **Os impactos potenciais** (e.g., acesso a dados sensíveis, controle total do sistema).
+- **Recomendações para mitigar as vulnerabilidades**.
